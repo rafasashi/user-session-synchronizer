@@ -32,9 +32,10 @@ Installing "User Session Synchronizer" can be done either by searching for "User
 
 ## Screenshots
 
-1. Description of first screenshot named screenshot-1
-2. Description of second screenshot named screenshot-2
-3. Description of third screenshot named screenshot-3
+1. https://raw.githubusercontent.com/rafasashi/user-session-synchronizer/master/screenshot_1.png
+2. https://raw.githubusercontent.com/rafasashi/user-session-synchronizer/master/screenshot_2.png
+3. https://raw.githubusercontent.com/rafasashi/user-session-synchronizer/master/screenshot_3.png
+4. https://raw.githubusercontent.com/rafasashi/user-session-synchronizer/master/screenshot_4.png
 
 ## Information
 
