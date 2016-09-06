@@ -1,0 +1,61 @@
+/*
+ * Plugin Name: User Session Synchronizer
+ * Version: 1.0
+ * Plugin URI: https://github.com/rafasashi/user-session-synchronizer/archive/master.zip
+ * Description: Keep the user logged in from one wordpress to another by synchronizing user data and cookie session.
+ * Author: Rafasashi
+ * Author URI: https://www.linkedin.com/in/raphaeldartigues
+ * Requires at least: 4.6
+ * Tested up to: 4.6
+ *
+ * Text Domain: user-session-synchronizer
+ * Domain Path: /lang/
+ *
+ * @package WordPress
+ * @author Rafasashi
+ * @since 1.0.0
+ */
+
+
+#login_register{
+                padding: 0px;
+                border: none;
+                margin: 0px;
+            }   
+            .confirm_box{
+                display: none;
+                margin-bottom: 6px;
+            }
+            input#confirmdCode {
+                width: 100%;
+                margin-bottom: 4px;
+            }   
+            input#confirmcode_button {
+                width: 100%;
+                padding: 5px;
+                height: 36px;
+            }
+            #resendverifycode{
+                width: 100%;
+                padding: 5px;
+                height: 36px;
+                display:none;
+            }
+
+            .row.error_box {
+                display:none;
+                color: red;
+                margin: 0px;
+                font-size: 13px;
+                border: 1px solid #B3B3B3;
+                padding: 4px;
+            }
+            .width33{
+                float:left;
+            }
+            .oknotice{
+                color: #248805;
+                border: 1px solid #248805;
+                font-size: 13px;
+                padding-left: 3px;
+            }
