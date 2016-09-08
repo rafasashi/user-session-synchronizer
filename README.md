@@ -16,10 +16,10 @@ The user email is encrypted based on the current user ip and a secret key shared
 - Prevent user form changing email
 - Display historical sessions
 - Auto add new subscriber if user doesn't exist
-- Destroy session everywhere on logging out
 
 ### Upcoming
 
+- Destroy session everywhere
 - Multiple secret keys & network
 
 ## Installation
@@ -29,6 +29,8 @@ Installing "User Session Synchronizer" can be done either by searching for "User
 1. Download the plugin via WordPress.org
 2. Upload the ZIP file through the 'Plugins > Add New > Upload' screen in your WordPress dashboard
 3. Activate the plugin through the 'Plugins' menu in WordPress
+4. Set your first Secret Key throught the 'User Session Sync > Keys'
+5. Repeat this installation process for every Wordpress you wish to sychnorize with the same Secret Key
 
 ## Screenshots
 
