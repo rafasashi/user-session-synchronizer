@@ -134,7 +134,7 @@ class User_Session_Synchronizer_Settings {
 				array(
 					'id' 			=> 'domain_list_1',
 					'label'			=> __( 'List of domains 1' , 'user-session-synchronizer' ),
-					'description'	=> __( 'List of domains to synchronize together. Separate multiple domains with line breaks.', 'user-session-synchronizer' ),
+					'description'	=> __( 'List of allowed domains to synchronize together. Separate multiple domains with line breaks.', 'user-session-synchronizer' ),
 					'type'			=> 'textarea',
 					'default'		=> '',
 					'placeholder'	=> __( $_SERVER['HTTP_HOST'], 'user-session-synchronizer' )
