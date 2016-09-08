@@ -119,8 +119,8 @@ class User_Session_Synchronizer_Settings {
 	 */
 	private function settings_fields () {
 
-		$settings['standard'] = array(
-			'title'					=> __( 'General Options', 'user-session-synchronizer' ),
+		$settings['keys'] = array(
+			'title'					=> __( 'Keys', 'user-session-synchronizer' ),
 			'description'			=> __( 'This plugin uses the user email address as a unique ID to synchronize the session between two wordpress installations.', 'user-session-synchronizer' ),
 			'fields'				=> array(
 				array(
@@ -198,7 +198,7 @@ class User_Session_Synchronizer_Settings {
 		
 		/*
 		$settings['extra'] = array(
-			'title'					=> __( 'Extra', 'user-session-synchronizer' ),
+			'title'					=> __( 'Iframes', 'user-session-synchronizer' ),
 			'description'			=> __( 'These are some extra input fields that maybe aren\'t as common as the others.', 'user-session-synchronizer' ),
 			'fields'				=> array(
 				array(
@@ -246,14 +246,19 @@ class User_Session_Synchronizer_Settings {
 	 * @return void
 	 */
 	public function register_settings () {
+		
 		if ( is_array( $this->settings ) ) {
 
 			// Check posted/selected tab
 			$current_section = '';
 			if ( isset( $_POST['tab'] ) && $_POST['tab'] ) {
+				
 				$current_section = $_POST['tab'];
-			} else {
+			} 
+			else {
+				
 				if ( isset( $_GET['tab'] ) && $_GET['tab'] ) {
+					
 					$current_section = $_GET['tab'];
 				}
 			}
@@ -270,6 +275,7 @@ class User_Session_Synchronizer_Settings {
 					// Validation callback for field
 					$validation = '';
 					if ( isset( $field['callback'] ) ) {
+						
 						$validation = $field['callback'];
 					}
 
@@ -287,6 +293,7 @@ class User_Session_Synchronizer_Settings {
 	}
 
 	public function settings_section ( $section ) {
+		
 		$html = '<p> ' . $this->settings[ $section['id'] ]['description'] . '</p>' . "\n";
 		echo $html;
 	}
