@@ -16,11 +16,11 @@ The user email is encrypted based on the current user ip and a secret key shared
 - Prevent user form changing email
 - Display historical sessions
 - Auto add new subscriber if user doesn't exist
+- Destroy session everywhere on logging out
 
 ### Upcoming
 
-- Destroy session everywhere
-- Multiple secret keys & network
+- Multiple secret keys & networks
 
 ## Installation
 
