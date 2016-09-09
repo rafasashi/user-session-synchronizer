@@ -1,1 +1,3 @@
 *.svn-base
+.svn/entries
+.svn/format
