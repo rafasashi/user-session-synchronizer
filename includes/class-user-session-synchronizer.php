@@ -177,11 +177,13 @@ class User_Session_Synchronizer {
 	 
 		// apply only to user profile or user edit pages
 		if ($pagenow!=='profile.php' && $pagenow!=='user-edit.php') {
+			
 			return;
 		}
 	 
 		// do not change anything for the administrator
 		if (current_user_can('administrator')) {
+			
 			return;
 		}
 	 
@@ -289,7 +291,7 @@ class User_Session_Synchronizer {
 					} 
 					else{
 						
-						var_dump($this->ussync_decrypt_uri($_GET['ussync-token'], get_option('ussync_secret_key_'.$key_num) ));exit;
+						$this->ussync_decrypt_uri($_GET['ussync-token'], get_option('ussync_secret_key_'.$key_num) );
 						
 						echo 'Error logging out...';
 						exit;					
