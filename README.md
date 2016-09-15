@@ -21,6 +21,7 @@ The user email is encrypted based on the current user ip and a secret key shared
 ### Upcoming
 
 - Multiple secret keys & networks
+- Enable ajax cross-domain requests
 
 ## Installation
 
