@@ -84,7 +84,7 @@ class User_Session_Synchronizer {
 	 */
 	 
 	public function __construct ( $file = '', $version = '1.0.0' ) {
-		
+
 		$this->_version = $version;
 		$this->_token = 'user-session-synchronizer';
 
@@ -95,19 +95,6 @@ class User_Session_Synchronizer {
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
 
 		$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		
-		// set user information
-		
-		$this->user_id = get_current_user_id();
-		
-		if( is_admin() ) {
-			
-			$this->user_verified = 'true';
-		}
-		else{
-			
-			$this->user_verified = get_user_meta( $this->user_id, "ussync_email_verified", TRUE);
-		}
 		
 		// set user ip
 		
@@ -156,10 +143,6 @@ class User_Session_Synchronizer {
 		// Handle profile updates
 		add_action( 'user_profile_update_errors', array( $this, 'ussync_prevent_email_change'), 10, 3 );
 		add_action( 'admin_init', array( $this, 'ussync_user_profile_fields_disable'));
-		
-		// Handle footers
-		add_action( 'wp_footer', array( $this, 'ussync_add_footer' ));
-		add_action( 'admin_footer_text', array( $this, 'ussync_add_footer' ));
 
 	} // End __construct ()
 
@@ -213,6 +196,23 @@ class User_Session_Synchronizer {
 	
 	public function ussync_synchronize_session(){
 		
+		// set user information
+		
+		$this->user_id = get_current_user_id();
+		
+		// check user verified
+		
+		if( current_user_can('administrator') ) {
+
+			$this->user_verified = 'true';
+		}
+		else{
+			
+			$this->user_verified = get_user_meta( $this->user_id, "ussync_email_verified", TRUE);
+		}
+		
+		// synchronize sessions
+
 		if(isset($_GET['action'])&&$_GET['action']=='logout'){
 			
 			$this-> ussync_call_domains(true);
@@ -388,12 +388,24 @@ class User_Session_Synchronizer {
 				exit;				
 			}
 		}
+		else{
+			
+			if( is_admin() ) {
+				
+				add_action( 'admin_footer_text', array( $this, 'ussync_add_footer' ));
+			}
+			else{
+				
+				add_action( 'wp_footer', array( $this, 'ussync_add_footer' ));
+			}			
+		}
+
 	}
 	
     public function ussync_add_footer(){
-		
-		if(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
 			
+		if(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
+
 			$this-> ussync_call_domains();
 		}
 

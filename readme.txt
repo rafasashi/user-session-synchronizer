@@ -2,9 +2,9 @@
 Contributors: rafasashi
 Donate link: https://www.paypal.me/recuweb
 Tags: user, session, synchronizer, cookie
-Requires at least: 4.6
-Tested up to: 4.6
-Stable tag: 1.0
+Requires at least: 4.3
+Tested up to: 4.3
+Stable tag: 1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -29,6 +29,7 @@ The user email is encrypted based on the current user ip and a secret key shared
 = Upcoming =
 
 - Multiple secret keys & networks
+- Enable ajax cross-domain requests
 
 == Installation ==
 
