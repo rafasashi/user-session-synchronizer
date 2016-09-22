@@ -388,29 +388,21 @@ class User_Session_Synchronizer {
 				exit;				
 			}
 		}
-		else{
+		elseif(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
+			
+			//add footers
 			
 			if( is_admin() ) {
 				
-				add_action( 'admin_footer_text', array( $this, 'ussync_add_footer' ));
+				add_action( 'admin_footer_text', array( $this, 'ussync_call_domains' ));
 			}
 			else{
 				
-				add_action( 'wp_footer', array( $this, 'ussync_add_footer' ));
+				add_action( 'wp_footer', array( $this, 'ussync_call_domains' ));
 			}			
 		}
 
 	}
-	
-    public function ussync_add_footer(){
-			
-		if(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
-
-			$this-> ussync_call_domains();
-		}
-
-        return true;
-    }
 	
 	public function ussync_call_domains($loggingout=false){
 		
