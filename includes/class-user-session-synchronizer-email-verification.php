@@ -40,7 +40,7 @@
 
 			register_activation_hook(__FILE__, array($this, 'ussync_activate_plugins_email'));
 
-			add_action('wp_login', array( $this, 'ussync_after_user_loggedin'),10);
+			//add_action('wp_login', array( $this, 'ussync_after_user_loggedin'),10);
 			
 			add_shortcode('ussyncemailverificationcode', array($this, 'ussync_email_verification_link'));
 

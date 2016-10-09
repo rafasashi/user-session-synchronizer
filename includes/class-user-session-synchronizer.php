@@ -83,6 +83,9 @@ class User_Session_Synchronizer {
 	 * @return  void
 	 */
 	 
+	public $key_num;
+	public $secret_key;
+	 
 	public function __construct ( $file = '', $version = '1.0.0' ) {
 
 		$this->_version = $version;
@@ -98,23 +101,36 @@ class User_Session_Synchronizer {
 		
 		// set user ip
 		
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+		if(isset($_SERVER['HTTP_CLIENT_IP'])&&!empty($_SERVER['HTTP_CLIENT_IP'])) {
 			
 			$this->user_ip = $_SERVER['HTTP_CLIENT_IP'];
 		} 
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])&&!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 			
 			$this->user_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		} 
-		else {
+		else{
 			
 			$this->user_ip = $_SERVER['REMOTE_ADDR'];
 		}
 		
 		// set user agent
 		
-		$this->user_agent = $_SERVER ['HTTP_USER_AGENT'];
+		$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
 		
+		// set secret key number
+		
+		$this -> key_num=1;
+		
+		if(isset($_GET['ussync-key'])){
+			
+			$this -> key_num=(int)trim($_GET['ussync-key']);
+		}
+		
+		//get secret_key
+		
+		$this -> secret_key = get_option('ussync_secret_key_'.$this -> key_num);
+
 		// register plugin activation hook
 		
 		register_activation_hook( $this->file, array( $this, 'install' ) );
@@ -211,6 +227,12 @@ class User_Session_Synchronizer {
 			$this->user_verified = get_user_meta( $this->user_id, "ussync_email_verified", TRUE);
 		}
 		
+		// add cors header
+		if(is_user_logged_in()){
+			
+			add_action( 'send_headers', array($this, 'ussync_add_cors_header') );
+		}		
+		
 		// synchronize sessions
 
 		if(isset($_GET['action'])&&$_GET['action']=='logout'){
@@ -228,30 +250,22 @@ class User_Session_Synchronizer {
 			exit;
 		}
 		elseif(isset($_GET['ussync-token'])&&isset($_GET['ussync-id'])&&isset($_GET['ussync-ref'])){
-			
-			// set secret key number
-			
-			$key_num=1;
-			
-			if(isset($_GET['ussync-key'])){
-				
-				$key_num=(int)trim($_GET['ussync-key']);
-			}
 
 			//decrypted user_name
 			
 			$user_name = trim($_GET['ussync-id']);
-			$user_name = $this->ussync_decrypt_uri($user_name, get_option('ussync_secret_key_'.$key_num) );
+			$user_name = $this->ussync_decrypt_uri($user_name);
 
 			//decrypted user_name
 			
-			$user_ref = trim($_GET['ussync-ref']);
-			$user_ref = $this->ussync_decrypt_uri($user_ref, get_option('ussync_secret_key_'.$key_num) );
+			$user_ref = ($_GET['ussync-ref']);
+			
+			$user_ref = $this->ussync_decrypt_uri($user_ref);
 			
 			//decrypted user_email
 			
 			$user_email = trim($_GET['ussync-token']);
-			$user_email = $this->ussync_decrypt_uri($user_email, get_option('ussync_secret_key_'.$key_num) );
+			$user_email = $this->ussync_decrypt_uri($user_email);
 			
 			//set user ID
 			
@@ -259,7 +273,7 @@ class User_Session_Synchronizer {
 			
 			//get domain list
 			
-			$domain_list = get_option('ussync_domain_list_'.$key_num);
+			$domain_list = get_option('ussync_domain_list_'.$this -> key_num);
 			$domain_list = explode(PHP_EOL,$domain_list);
 			
 			//get valid domains
@@ -303,7 +317,7 @@ class User_Session_Synchronizer {
 					} 
 					else{
 						
-						$this->ussync_decrypt_uri($_GET['ussync-token'], get_option('ussync_secret_key_'.$key_num) );
+						$this->ussync_decrypt_uri($_GET['ussync-token']);
 						
 						echo 'Error logging out...';
 						exit;					
@@ -319,7 +333,7 @@ class User_Session_Synchronizer {
 						
 						if( !email_exists( $user_email ) ){
 						
-							$ussync_no_user = get_option('ussync_no_user_'.$key_num);
+							$ussync_no_user = get_option('ussync_no_user_'.$this -> key_num);
 						
 							if($ussync_no_user=='register_suscriber'){
 								
@@ -395,7 +409,7 @@ class User_Session_Synchronizer {
 				}
 			}
 			else{
-				
+
 				echo 'Host not allowed to synchronize...';
 				exit;				
 			}
@@ -413,35 +427,52 @@ class User_Session_Synchronizer {
 				add_action( 'wp_footer', array( $this, 'ussync_call_domains' ));
 			}			
 		}
+	}
+	
+	function ussync_add_cors_header() {
+		
+		// Allow from valid origin
+		/*
+		//if (isset($_SERVER['HTTP_ORIGIN'])) {
+			
+			header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+			header('Access-Control-Allow-Credentials: true');
+			header('Access-Control-Max-Age: 86400');    // cache for 1 day
+		//}
 
+		// Access-Control headers are received during OPTIONS requests
+
+		if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+
+			if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+				header("Access-Control-Allow-Methods: GET, POST, OPTIONS");         
+
+			if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+				header("Access-Control-Allow-Headers:        {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+
+			exit(0);
+		}
+		*/
 	}
 	
 	public function ussync_call_domains($loggingout=false){
 		
 		if($user = wp_get_current_user()){
-			
-			//get secret key number
-			
-			$key_num = 1; 			
-			
-			//get secret key
-			
-			$secret_key=get_option('ussync_secret_key_'.$key_num);
-			
+
 			//get list of domains
 			
-			$domains = get_option('ussync_domain_list_'.$key_num);
+			$domains = get_option('ussync_domain_list_'.$this -> key_num);
 			$domains = explode(PHP_EOL,$domains);
 			
 			//get encrypted user name
 			
 			$user_name = $user->user_login;
-			$user_name = $this->ussync_encrypt_uri($user_name, $secret_key);
+			$user_name = $this->ussync_encrypt_uri($user_name);
 			
 			//get encrypted user email
 			
 			$user_email = $user->user_email;
-			$user_email = $this->ussync_encrypt_uri($user_email, $secret_key);
+			$user_email = $this->ussync_encrypt_uri($user_email);
 			
 			//get current domain
 			
@@ -453,7 +484,7 @@ class User_Session_Synchronizer {
 			
 			//$user_ref = $_SERVER['HTTP_HOST'];
 			$user_ref = $current_domain;
-			$user_ref = $this->ussync_encrypt_uri($user_ref, $secret_key);			
+			$user_ref = $this->ussync_encrypt_uri($user_ref);
 			
 			if(!empty($domains)){
 				
@@ -469,20 +500,23 @@ class User_Session_Synchronizer {
 							
 							$opts = array(
 							  'http'=>array(
-								'method'=>"GET",
-								'header'=>"User-Agent: " . $this->user_agent . "\r\n"
+								'method' => "GET",
+								'header' => "User-Agent: " . $this -> user_agent . "\r\n" . 
+											"X-Forwarded-For: " . $this->user_ip . "\r\n"
 							  )
 							);
 
 							$context = stream_context_create($opts);							
 							
-							file_get_contents('http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
+							$response = file_get_contents('http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
+							 
+							//var_dump($response);exit;
 						}
 						else{
 							
 							//output html
 						
-							echo '<img class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="display:none;width:0;height:0;">';								
+							echo '<img class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="display:none;width:0;height:0;">';								
 						}
 					}
 				}				
@@ -490,17 +524,16 @@ class User_Session_Synchronizer {
 		}
 	}
 	
-
-	private function ussync_encrypt_str($string, $secret_key){
+	private function ussync_encrypt_str($string){
 		
 		$output = false;
 
 		$encrypt_method = "AES-256-CBC";
 		
-		$secret_key = md5($secret_key);
+		$secret_key = md5( $this -> secret_key );
 		
-		$secret_iv = md5($this->user_agent . $this->user_ip);
-
+		$secret_iv = md5( $this->user_agent . $this->user_ip );
+		
 		// hash
 		$key = hash('sha256', $secret_key);
 		
@@ -513,37 +546,37 @@ class User_Session_Synchronizer {
 		return $output;
 	}
 	
-	private function ussync_decrypt_str($string, $secret_key){
+	private function ussync_decrypt_str($string){
 		
 		$output = false;
 
 		$encrypt_method = "AES-256-CBC";
 		
-		$secret_key = md5($secret_key);
+		$secret_key = md5( $this->secret_key );
 		
-		$secret_iv = md5($this->user_agent . $this->user_ip);
+		$secret_iv = md5( $this->user_agent . $this->user_ip );
 
 		// hash
-		$key = hash('sha256', $secret_key);
+		$key = hash( 'sha256', $secret_key);
 		
 		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
-		$iv = substr(hash('sha256', $secret_iv), 0, 16);
+		$iv = substr( hash( 'sha256', $secret_iv ), 0, 16);
 
 		$output = openssl_decrypt($this->ussync_base64_urldecode($string), $encrypt_method, $key, 0, $iv);
 
 		return $output;
 	}
 	
-	private function ussync_encrypt_uri($uri,$secret_key,$len=250,$separator='/'){
+	private function ussync_encrypt_uri($uri,$len=250,$separator='/'){
 		
-		$uri = wordwrap($this->ussync_encrypt_str($uri,$secret_key),$len,$separator,true);
+		$uri = wordwrap($this->ussync_encrypt_str($uri),$len,$separator,true);
 		
 		return $uri;
 	}
 	
-	private function ussync_decrypt_uri($uri,$secret_key,$separator='/'){
+	private function ussync_decrypt_uri($uri,$separator='/'){
 		
-		$uri = $this->ussync_decrypt_str(str_replace($separator,'',$uri),$secret_key);
+		$uri = $this->ussync_decrypt_str(str_replace($separator,'',$uri));
 		
 		return $uri;
 	}

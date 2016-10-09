@@ -59,6 +59,10 @@ This plugin template is designed to Keep the user logged in from one wordpress t
 
 ## Changelog ##
 
+### 1.3
+* 2016-10-09
+* Multiple Logout issues corrected
+
 ### 1.2
 * 2016-09-26
 * Multiple subfolders under same domain
