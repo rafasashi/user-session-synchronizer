@@ -18,7 +18,9 @@ class User_Session_Synchronizer {
 	 * @access  public
 	 * @since   1.0.0
 	 */
+	public $emailVerification = null;
 	public $settings = null;
+	public $sessionControl = null;
 
 	/**
 	 * The version number.
