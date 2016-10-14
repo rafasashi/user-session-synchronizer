@@ -60,6 +60,10 @@ This plugin template is designed to Keep the user logged in from one wordpress t
 ## Changelog ##
 
 ### 1.3
+
+* 2016-10-14
+* Issue regarding email validation corrected
+
 * 2016-10-09
 * Multiple Logout issues corrected
 
