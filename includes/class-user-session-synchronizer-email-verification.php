@@ -196,7 +196,7 @@
 			
 			//var_dump(wp_verify_nonce($_GET["wp_nonce"], "ussync_email"));
 			
-			if(isset($_GET["user_id"]) && wp_verify_nonce($_GET["wp_nonce"], "ussync_email") && isset($_GET["ussync_confirm"])) {
+			if(isset($_GET["user_id"]) && isset($_GET["wp_nonce"]) && wp_verify_nonce($_GET["wp_nonce"], "ussync_email") && isset($_GET["ussync_confirm"])) {
 				
 				if($_GET["ussync_confirm"] === 'true' || $_GET["ussync_confirm"] === 'false'){
 					
