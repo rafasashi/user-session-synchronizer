@@ -3,8 +3,8 @@ Contributors: rafasashi
 Donate link: https://www.paypal.me/recuweb
 Tags: user, session, synchronizer, cookie
 Requires at least: 4.3
-Tested up to: 4.3
-Stable tag: 1.3.2
+Tested up to: 4.6
+Stable tag: 1.3.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,17 @@ This plugin template is designed to Keep the user logged in from one wordpress t
 
 == Changelog ==
 
-= 1.3 =
+= 1.3.3 =
+
+* 2016-10-26
+* Resend validation email improved
+
+= 1.3.2 =
 
 * 2016-10-14
 * Issue regarding email validation corrected
+
+= 1.3.1 =
 
 * 2016-09-26
 * Multiple Logout issues corrected

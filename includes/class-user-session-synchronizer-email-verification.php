@@ -119,17 +119,27 @@
 		}
 
 		public function ussync_codeMailSender($email) {
-			
+					
+			$urlparts = parse_url(site_url());
+			$domain = $urlparts ['host'];						
+					
 			$Email_title = get_option("ussync_email_conf_title");
 			$sender_email = get_option("ussync_email_confemail");
 			$message = get_option("ussync-email-header");
-			$header = "From: $Email_title <$sender_email> \r\n";
-			$header .= "MIME-Version: 1.0\r\n";
-			$header .= "Content-type: text/html\r\n";
+			
+			$headers   = [];
+			$headers[] = 'From: ' . get_bloginfo('name') . ' <noreply@'.$domain.'>';
+			$headers[] = 'MIME-Version: 1.0';
+			$headers[] = 'Content-type: text/html';
+			
 			$preMesaage = "<html><body><div style='width:700px;padding:5px;margin:auto;font-size:14px;line-height:18px'>" . apply_filters('the_content', $message) . "<div style='clear:both'></div></div></body></html>";
-			//global $email
-			do_action("ussync_confirmation_email_before_sending", $email, $Email_title, $preMesaage, $header);
-			wp_mail($email, $Email_title, $preMesaage, $header);
+			
+			if(!wp_mail($email, $Email_title, $preMesaage, $headers)){
+				
+				global $phpmailer;
+				
+				var_dump($phpmailer->ErrorInfo);exit;				
+			}
 		}		
 		
 		public function ussync_email_verification_link(){
@@ -202,19 +212,24 @@
 					
 					update_user_meta($_GET["user_id"], "ussync_email_verified", $_GET["ussync_confirm"]);
 				}
-				elseif($_GET["ussync_confirm"] === 'resend' && get_user_meta((int) $_GET["user_id"], "ussync_email_verified", TRUE) == 'false'){
+				elseif($_GET["ussync_confirm"] === 'resend'){
+
+					$user_id = intval($_GET['user_id']);
 					
-					$user_id = $_GET['user_id'];
+					$email_verified = get_user_meta(($user_id), "ussync_email_verified", TRUE);
 					
-					$user = get_user_by("id", $user_id);
-					
-					$scret_code = md5( $user->user_email . time() );
-					
-					update_user_meta($user_id, "ussync_email_verifiedcode", $scret_code);
-					
-					$this->ussync_codeMailSender($user->user_email);
-					
-					echo '<div class="updated fade"><p>Email sent to '.$user->user_email.'</p></b></div>';
+					if( $email_verified !== 'true' ){
+						
+						$user = get_user_by("id", $user_id);
+						
+						$scret_code = md5( $user->user_email . time() );
+						
+						update_user_meta($user_id, "ussync_email_verifiedcode", $scret_code);
+						
+						$this->ussync_codeMailSender($user->user_email);
+						
+						echo '<div class="updated fade"><p>Email sent to '.$user->user_email.'</p></b></div>';						
+					}
 				}
 			}
 		}
