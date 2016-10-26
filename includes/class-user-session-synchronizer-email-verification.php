@@ -180,8 +180,17 @@
 					
 					if (get_user_meta($user_id, "ussync_email_verified", true) != "true") {
 						
-						$text = "<img src='" . plugin_dir_url(__FILE__) . "images/wrong_arrow.png' width=25 height=25>";
-						$row .= "<a title=\"Validate User\" href=\"" . add_query_arg(array("user_id" => $user_id, "wp_nonce" => wp_create_nonce("ussync_email"), "ussync_confirm" => "true"), get_admin_url() . "users.php") . "\">" . apply_filters("ussync_email_confirmation_manual_verify", $text) . "</a>";
+						if (get_user_meta($user_id, "ussync_has_not_logged_in_yet", true) == "true") {
+							
+							$text = "<img src='" . plugin_dir_url(__FILE__) . "images/time.png' width=25 height=25>";
+							$row .= "<a title=\"Validate User\" href=\"" . add_query_arg(array("user_id" => $user_id, "wp_nonce" => wp_create_nonce("ussync_email"), "ussync_confirm" => "true"), get_admin_url() . "users.php") . "\">" . apply_filters("ussync_email_confirmation_manual_verify", $text) . "</a>";							
+						}
+						else{
+							
+							$text = "<img src='" . plugin_dir_url(__FILE__) . "images/wrong_arrow.png' width=25 height=25>";
+							$row .= "<a title=\"Validate User\" href=\"" . add_query_arg(array("user_id" => $user_id, "wp_nonce" => wp_create_nonce("ussync_email"), "ussync_confirm" => "true"), get_admin_url() . "users.php") . "\">" . apply_filters("ussync_email_confirmation_manual_verify", $text) . "</a>";
+						}
+						
 
 						$text = "<img src='" . plugin_dir_url(__FILE__) . "images/send.png' width=25 height=25>";
 						$row .= "<a title=\"Resend Validation Email\" href=\"" . add_query_arg(array("user_id" => $user_id, "wp_nonce" => wp_create_nonce("ussync_email"), "ussync_confirm" => "resend"), get_admin_url() . "users.php") . "\">" . apply_filters("ussync_email_confirmation_manual_verify", $text) . "</a>";						
