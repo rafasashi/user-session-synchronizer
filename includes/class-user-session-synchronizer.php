@@ -432,7 +432,7 @@ class User_Session_Synchronizer {
 		/*
 		elseif(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
 			
-			//add footers
+			//add footers everywhere (deprecated)
 			
 			if( is_admin() ) {
 				
