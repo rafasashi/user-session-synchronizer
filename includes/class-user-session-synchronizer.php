@@ -161,13 +161,7 @@ class User_Session_Synchronizer {
 		// Handle profile updates
 		add_action( 'user_profile_update_errors', array( $this, 'ussync_prevent_email_change'), 10, 3 );
 		add_action( 'admin_init', array( $this, 'ussync_user_profile_fields_disable'));
-		
-		add_filter( 'login_redirect', function ( $redirect_to, $request, $user ) {
 
-			return home_url().'/?ussync-status=logging-in&redirect_to='.urlencode($redirect_to);
-			
-		}, 100, 3 );		
-		
 	} // End __construct ()
 
 	public function ussync_prevent_email_change( $errors, $update, $user ) {
@@ -254,15 +248,8 @@ class User_Session_Synchronizer {
 		}
 		elseif(is_user_logged_in() && isset($_GET['redirect_to'])){
 			
-			if(isset($_GET['ussync-status']) && $_GET['ussync-status']=='logging-in'){
-			
-				include plugin_dir_path(__FILE__) . "views/logging-in.php";
-			}
-			else{
-				
-				wp_safe_redirect( trim( $_GET['redirect_to'] ) );
-				exit;
-			}
+			wp_safe_redirect( trim( $_GET['redirect_to'] ) );
+			exit;
 		}
 		elseif(isset($_GET['ussync-token'])&&isset($_GET['ussync-id'])&&isset($_GET['ussync-ref'])){
 
@@ -429,10 +416,9 @@ class User_Session_Synchronizer {
 				exit;				
 			}
 		}
-		/*
 		elseif(is_user_logged_in() && !isset($_GET['ussync-token']) && $this->user_verified === 'true'){
 			
-			//add footers everywhere (deprecated)
+			//add footers
 			
 			if( is_admin() ) {
 				
@@ -443,7 +429,6 @@ class User_Session_Synchronizer {
 				add_action( 'wp_footer', array( $this, 'ussync_call_domains' ));
 			}			
 		}
-		*/
 	}
 	
 	function ussync_add_cors_header() {
