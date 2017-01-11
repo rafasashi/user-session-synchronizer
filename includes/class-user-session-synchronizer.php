@@ -103,18 +103,7 @@ class User_Session_Synchronizer {
 		
 		// set user ip
 		
-		if(isset($_SERVER['HTTP_CLIENT_IP'])&&!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			
-			$this->user_ip = $_SERVER['HTTP_CLIENT_IP'];
-		} 
-		elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])&&!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			
-			$this->user_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} 
-		else{
-			
-			$this->user_ip = $_SERVER['REMOTE_ADDR'];
-		}
+		$this->user_ip = $this->ussync_get_user_ip();
 		
 		// set user agent
 		
@@ -164,6 +153,23 @@ class User_Session_Synchronizer {
 
 	} // End __construct ()
 
+	public function ussync_get_user_ip() {
+		
+		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
+			
+			if (array_key_exists($key, $_SERVER) === true){
+				
+				foreach (array_map('trim', explode(',', $_SERVER[$key])) as $ip){
+					
+					if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false){
+						
+						return $ip;
+					}
+				}
+			}
+		}
+	}	
+	
 	public function ussync_prevent_email_change( $errors, $update, $user ) {
 
 		$old = get_user_by('id', $user->ID);
@@ -527,6 +533,14 @@ class User_Session_Synchronizer {
 		}
 	}
 	
+	private function ussync_get_secret_iv(){
+		
+		//$secret_iv = md5( $this->user_agent . $this->user_ip );
+		$secret_iv = md5( $this->user_ip );
+		
+		return $secret_iv;
+	}
+	
 	private function ussync_encrypt_str($string){
 		
 		$output = false;
@@ -535,7 +549,7 @@ class User_Session_Synchronizer {
 		
 		$secret_key = md5( $this -> secret_key );
 		
-		$secret_iv = md5( $this->user_agent . $this->user_ip );
+		$secret_iv = $this->ussync_get_secret_iv();
 		
 		// hash
 		$key = hash('sha256', $secret_key);
@@ -557,7 +571,7 @@ class User_Session_Synchronizer {
 		
 		$secret_key = md5( $this->secret_key );
 		
-		$secret_iv = md5( $this->user_agent . $this->user_ip );
+		$secret_iv = $this->ussync_get_secret_iv();
 
 		// hash
 		$key = hash( 'sha256', $secret_key);
