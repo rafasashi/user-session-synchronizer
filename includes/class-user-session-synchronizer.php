@@ -536,7 +536,8 @@ class User_Session_Synchronizer {
 	private function ussync_get_secret_iv(){
 		
 		//$secret_iv = md5( $this->user_agent . $this->user_ip );
-		$secret_iv = md5( $this->user_ip );
+		//$secret_iv = md5( $this->user_ip );
+		$secret_iv = md5( 'another-secret' );
 		
 		return $secret_iv;
 	}
