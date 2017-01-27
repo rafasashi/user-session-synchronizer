@@ -4,7 +4,7 @@ Donate link: https://www.paypal.me/recuweb
 Tags: user, session, synchronizer, cookie
 Requires at least: 4.3
 Tested up to: 4.6
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 

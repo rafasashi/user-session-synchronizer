@@ -47,7 +47,7 @@ Installing "User Session Synchronizer" can be done either by searching for "User
 - Tags: user, session, synchronizer, cookie
 - Requires at least: 4.3
 - Tested up to: 4.6
-- Stable tag: 1.3.3
+- Stable tag: 1.3.4
 - License: GPLv3 or later
 - License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -58,6 +58,12 @@ Installing "User Session Synchronizer" can be done either by searching for "User
 This plugin template is designed to Keep the user logged in from one wordpress to another by synchronizing user data and cookie session
 
 ## Changelog ##
+
+### 1.3.4
+
+* 2017-01-27
+* User IP detection improved 
+* Synchronization via iframe instead of image 
 
 ### 1.3.3
 
