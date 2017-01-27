@@ -335,7 +335,7 @@ class User_Session_Synchronizer {
 					
 					$current_user = wp_get_current_user();
 
-					if(!is_user_logged_in() || $current_user->user_email != $user_email){				
+					if(!is_user_logged_in()){				
 						
 						// check if the user exists
 						
@@ -408,6 +408,13 @@ class User_Session_Synchronizer {
 							echo 'Error logging in...';
 							exit;						
 						}					
+					}
+					elseif($current_user->user_email != $user_email){
+						
+						//wp_mail($dev_email, 'Debug user sync id ' . $current_user->ID . ' - ip ' . $this->user_ip . ' user_email: '. $current_user->user_email .' request email: '. $user_email.' $_SERVER: ' . print_r($_SERVER,true));
+					
+						echo 'Another user already logged in...';
+						exit;
 					}
 					else{
 						
@@ -525,7 +532,9 @@ class User_Session_Synchronizer {
 							
 							//output html
 						
-							echo '<img class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="display:none;width:0;height:0;">';								
+							//echo '<img class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
+							
+							echo'<iframe class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;"></iframe>';
 						}
 					}
 				}				
