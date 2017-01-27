@@ -384,7 +384,9 @@ class User_Session_Synchronizer {
 							$sessions->destroy_all();	
 						}					
 						
-						if($user=get_user_by('email',$user_email)){
+						$user = get_user_by('email',$user_email);
+						
+						if( isset($user->ID) && intval($user->ID) > 0 ){
 							
 							//do the authentication
 							
@@ -400,7 +402,11 @@ class User_Session_Synchronizer {
 								
 								//redirect after authentication
 								
-								wp_safe_redirect( rtrim( get_site_url(), '/' ) . '/?ussync-status=loggedin');
+								//wp_safe_redirect( rtrim( get_site_url(), '/' ) . '/?ussync-status=loggedin');
+							
+								
+								echo 'User '.$user->ID . ' logged in...';
+								exit;
 							}
 						}
 						else{
