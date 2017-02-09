@@ -239,6 +239,7 @@ class User_Session_Synchronizer {
 		if(is_user_logged_in()){
 			
 			add_action( 'send_headers', array($this, 'ussync_add_cors_header') );
+			add_action( 'send_headers', array($this, 'ussync_add_content_security_policy') );
 		}		
 		
 		// synchronize sessions
@@ -450,7 +451,7 @@ class User_Session_Synchronizer {
 		}
 	}
 	
-	function ussync_add_cors_header() {
+	public function ussync_add_cors_header() {
 		
 		// Allow from valid origin
 		/*
@@ -475,6 +476,14 @@ class User_Session_Synchronizer {
 			exit(0);
 		}
 		*/
+	}
+	
+	public function ussync_add_content_security_policy() {
+		
+		if( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ){
+			
+			header("Content-Security-Policy: upgrade-insecure-requests");
+		}
 	}
 	
 	public function ussync_call_domains($loggingout=false){

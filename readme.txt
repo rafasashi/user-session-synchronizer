@@ -56,6 +56,11 @@ This plugin template is designed to Keep the user logged in from one wordpress t
 
 == Changelog ==
 
+= 1.3.5 =
+
+* 2017-02-09
+* Content-Security-Policy implementation
+
 = 1.3.4 =
 
 * 2017-01-27
