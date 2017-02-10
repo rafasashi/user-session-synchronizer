@@ -87,6 +87,7 @@ class User_Session_Synchronizer {
 	 
 	public $key_num;
 	public $secret_key;
+	public $proto;
 	 
 	public function __construct ( $file = '', $version = '1.0.0' ) {
 
@@ -121,7 +122,18 @@ class User_Session_Synchronizer {
 		//get secret_key
 		
 		$this -> secret_key = get_option('ussync_secret_key_'.$this -> key_num);
-
+		
+		// get proto
+		
+		if( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ){
+			  
+			$this -> proto = 'https://';
+		}
+		else{
+			
+			$this -> proto = 'http://';
+		}
+		
 		// register plugin activation hook
 		
 		register_activation_hook( $this->file, array( $this, 'install' ) );
@@ -539,7 +551,7 @@ class User_Session_Synchronizer {
 
 							$context = stream_context_create($opts);							
 							
-							$response = file_get_contents('http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
+							$response = file_get_contents($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
 							 
 							//var_dump($response);exit;
 						}
@@ -547,9 +559,9 @@ class User_Session_Synchronizer {
 							
 							//output html
 						
-							//echo '<img class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
+							//echo '<img class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
 							
-							echo'<iframe class="ussync" src="http://' . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;"></iframe>';
+							echo'<iframe class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;"></iframe>';
 						}
 					}
 				}				
