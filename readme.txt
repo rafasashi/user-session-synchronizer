@@ -60,6 +60,7 @@ This plugin template is designed to Keep the user logged in from one wordpress t
 
 * 2017-02-09
 * Content-Security-Policy implementation
+* HTTPS supported
 
 = 1.3.4 =
 
