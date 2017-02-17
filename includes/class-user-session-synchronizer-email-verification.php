@@ -38,28 +38,28 @@
 			
 			$this->user_id = get_current_user_id();
 
-			register_activation_hook(__FILE__, array($this, 'ussync_activate_plugins_email'));
+			register_activation_hook(__FILE__, array($this, 'activate_plugins_email'));
 
 			//add_action('wp_login', array( $this, 'ussync_after_user_loggedin'),10);
 			
-			add_shortcode('ussyncemailverificationcode', array($this, 'ussync_email_verification_link'));
+			add_shortcode('ussyncemailverificationcode', array($this, 'get_email_verification_link'));
 
-			add_filter('manage_users_columns', array($this, 'ussync_update_user_table'), 10, 1);
-			add_filter('manage_users_custom_column', array($this, 'ussync_modify_user_table_row'), 10, 3);
+			add_filter('manage_users_columns', array($this, 'update_user_table'), 10, 1);
+			add_filter('manage_users_custom_column', array($this, 'modify_user_table_row'), 10, 3);
 			
-			add_action('user_register', array( $this, 'ussync_after_user_register'), 10, 1);
-			add_action('admin_head', array($this, 'ussync_verify_user'));
+			add_action('user_register', array( $this, 'after_user_register'), 10, 1);
+			add_action('admin_head', array($this, 'verify_user'));
 			
-			add_action('init', array($this, 'ussync_verify_registered_user'));
+			add_action('init', array($this, 'verify_registered_user'));
 		}
 		
-		public function ussync_after_user_register($user_id){
+		public function after_user_register($user_id){
 
 			// the new user just registered but never logged in yet
 			add_user_meta($user_id, 'ussync_has_not_logged_in_yet', 'true');
 		}
 
-		public function ussync_verify_registered_user(){
+		public function verify_registered_user(){
 			
 			if(isset($_GET["ussync_confirmation_verify"])){
 				
@@ -97,7 +97,7 @@
 			}
 		}		
 
-		public function ussync_activate_plugins_email() {
+		public function activate_plugins_email() {
 			
 			ob_start();
 			include plugin_dir_path(__FILE__) . "views/demo_email.html";
@@ -108,17 +108,17 @@
 			update_option("ussync_email_conf_title", "Please Verify Your email Account");
 		}
 
-		public function ussync_email_setting() {
+		public function get_email_setting() {
 			
 			include plugin_dir_path(__FILE__) . "views/email-setting.php";
 		}
 
-		public function ussync_user_email_verification() {
+		public function user_email_verification() {
 
 			include plugin_dir_path(__FILE__) . "views/email-verification.php";
 		}
 
-		public function ussync_codeMailSender($email) {
+		public function codeMailSender($email) {
 					
 			$urlparts = parse_url(site_url());
 			$domain = $urlparts ['host'];						
@@ -142,7 +142,7 @@
 			}
 		}		
 		
-		public function ussync_email_verification_link(){
+		public function get_email_verification_link(){
 			
 			$link='';
 			
@@ -162,13 +162,13 @@
 			return $link;
 		}
 
-		public function ussync_update_user_table($column) {
+		public function update_user_table($column) {
 			
 			$column['ussync_verified'] = 'Verified user';
 			return $column;
 		}
 
-		public function ussync_modify_user_table_row($val, $column_name, $user_id) {
+		public function modify_user_table_row($val, $column_name, $user_id) {
 			
 			$user_role = get_userdata($user_id);
 			
@@ -211,7 +211,7 @@
 			return $row;
 		}
 
-		public function ussync_verify_user() {
+		public function verify_user() {
 			
 			//var_dump(wp_verify_nonce($_GET["wp_nonce"], "ussync_email"));
 			
@@ -235,7 +235,7 @@
 						
 						update_user_meta($user_id, "ussync_email_verifiedcode", $scret_code);
 						
-						$this->ussync_codeMailSender($user->user_email);
+						$this->codeMailSender($user->user_email);
 						
 						echo '<div class="updated fade"><p>Email sent to '.$user->user_email.'</p></b></div>';						
 					}

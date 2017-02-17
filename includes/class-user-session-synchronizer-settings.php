@@ -76,9 +76,9 @@ class User_Session_Synchronizer_Settings {
 		//add menu in wordpress dashboard
 		
 		add_menu_page('User Session Sync', 'User Session Sync', 'manage_options', 'user-session-synchronizer', array($this, 'settings_page'),'dashicons-shield');
-		add_submenu_page("user-session-synchronizer", "User Verify ", "User Verify", 'administrator', 'ussync_user_email_verification', array( $this->parent->emailVerification, "ussync_user_email_verification"));
-		add_submenu_page("user-session-synchronizer", "User Sessions", "User Sessions", 'administrator', 'ussync_session_control', array( $this->parent->sessionControl, "ussync_session_control") );
-		add_submenu_page("user-session-synchronizer", "Email Template", "Email Template", 'administrator', 'ussync_email_setting', array( $this->parent->emailVerification, "ussync_email_setting"));
+		add_submenu_page("user-session-synchronizer", "User Verify ", "User Verify", 'administrator', 'user_email_verification', array( $this->parent->emailVerification, "user_email_verification"));
+		add_submenu_page("user-session-synchronizer", "User Sessions", "User Sessions", 'administrator', 'session_control', array( $this->parent->sessionControl, "session_control") );
+		add_submenu_page("user-session-synchronizer", "Email Template", "Email Template", 'administrator', 'get_email_setting', array( $this->parent->emailVerification, "get_email_setting"));
 			
 	}
 

@@ -104,7 +104,7 @@ class User_Session_Synchronizer {
 		
 		// set user ip
 		
-		$this->user_ip = $this->ussync_get_user_ip();
+		$this->user_ip = $this->get_user_ip();
 		
 		// set user agent
 		
@@ -157,15 +157,15 @@ class User_Session_Synchronizer {
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 
 		// Handle login synchronization
-		add_action( 'init', array( $this, 'ussync_synchronize_session' ), 0 );		
+		add_action( 'init', array( $this, 'synchronize_session' ), 0 );		
 		
 		// Handle profile updates
-		add_action( 'user_profile_update_errors', array( $this, 'ussync_prevent_email_change'), 10, 3 );
-		add_action( 'admin_init', array( $this, 'ussync_user_profile_fields_disable'));
+		add_action( 'user_profile_update_errors', array( $this, 'prevent_email_change'), 10, 3 );
+		add_action( 'admin_init', array( $this, 'disable_user_profile_fields'));
 
 	} // End __construct ()
 
-	public function ussync_get_user_ip() {
+	public function get_user_ip() {
 		
 		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
 			
@@ -182,7 +182,7 @@ class User_Session_Synchronizer {
 		}
 	}	
 	
-	public function ussync_prevent_email_change( $errors, $update, $user ) {
+	public function prevent_email_change( $errors, $update, $user ) {
 
 		$old = get_user_by('id', $user->ID);
 
@@ -190,7 +190,7 @@ class User_Session_Synchronizer {
 				$user->user_email = $old->user_email;
 	}
 	
-	public function ussync_user_profile_fields_disable() {
+	public function disable_user_profile_fields() {
 	 
 		global $pagenow;
 	 
@@ -206,14 +206,14 @@ class User_Session_Synchronizer {
 			return;
 		}
 	 
-		add_action( 'admin_footer', array( $this,'ussync_user_profile_fields_disable_js' ));
+		add_action( 'admin_footer', array( $this,'disable_user_profile_fields_js' ));
 	}
 	 
 	 
 	/**
 	 * Disables selected fields in WP Admin user profile (profile.php, user-edit.php)
 	 */
-	public function ussync_user_profile_fields_disable_js() {
+	public function disable_user_profile_fields_js() {
 		
 		?>
 			<script>
@@ -230,7 +230,7 @@ class User_Session_Synchronizer {
 		<?php
 	}	
 	
-	public function ussync_synchronize_session(){
+	public function synchronize_session(){
 		
 		// set user information
 		
@@ -250,15 +250,15 @@ class User_Session_Synchronizer {
 		// add cors header
 		if(is_user_logged_in()){
 			
-			add_action( 'send_headers', array($this, 'ussync_add_cors_header') );
-			add_action( 'send_headers', array($this, 'ussync_add_content_security_policy') );
+			add_action( 'send_headers', array($this, 'add_cors_header') );
+			add_action( 'send_headers', array($this, 'add_content_security_policy') );
 		}		
 		
 		// synchronize sessions
 
 		if(isset($_GET['action'])&&$_GET['action']=='logout'){
 			
-			$this-> ussync_call_domains(true);
+			$this-> get_domains(true);
 		}
 		elseif(isset($_GET['ussync-status']) && $_GET['ussync-status']=='loggedin'){
 			
@@ -275,18 +275,18 @@ class User_Session_Synchronizer {
 			//decrypted user_name
 			
 			$user_name = trim($_GET['ussync-id']);
-			$user_name = $this->ussync_decrypt_uri($user_name);
+			$user_name = $this->decrypt_uri($user_name);
 
 			//decrypted user_name
 			
 			$user_ref = ($_GET['ussync-ref']);
 			
-			$user_ref = $this->ussync_decrypt_uri($user_ref);
+			$user_ref = $this->decrypt_uri($user_ref);
 			
 			//decrypted user_email
 			
 			$user_email = trim($_GET['ussync-token']);
-			$user_email = $this->ussync_decrypt_uri($user_email);
+			$user_email = $this->decrypt_uri($user_email);
 			
 			//set user ID
 			
@@ -338,7 +338,7 @@ class User_Session_Synchronizer {
 					} 
 					else{
 						
-						$this->ussync_decrypt_uri($_GET['ussync-token']);
+						$this->decrypt_uri($_GET['ussync-token']);
 						
 						echo 'Error logging out...';
 						exit;					
@@ -454,16 +454,16 @@ class User_Session_Synchronizer {
 			
 			if( is_admin() ) {
 				
-				add_action( 'admin_footer_text', array( $this, 'ussync_call_domains' ));
+				add_action( 'admin_footer_text', array( $this, 'get_domains' ));
 			}
 			else{
 				
-				add_action( 'wp_footer', array( $this, 'ussync_call_domains' ));
+				add_action( 'wp_footer', array( $this, 'get_domains' ));
 			}			
 		}
 	}
 	
-	public function ussync_add_cors_header() {
+	public function add_cors_header() {
 		
 		// Allow from valid origin
 		/*
@@ -490,7 +490,7 @@ class User_Session_Synchronizer {
 		*/
 	}
 	
-	public function ussync_add_content_security_policy() {
+	public function add_content_security_policy() {
 		
 		if( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ){
 			
@@ -498,7 +498,7 @@ class User_Session_Synchronizer {
 		}
 	}
 	
-	public function ussync_call_domains($loggingout=false){
+	public function get_domains($loggingout=false){
 		
 		if($user = wp_get_current_user()){
 
@@ -510,12 +510,12 @@ class User_Session_Synchronizer {
 			//get encrypted user name
 			
 			$user_name = $user->user_login;
-			$user_name = $this->ussync_encrypt_uri($user_name);
+			$user_name = $this->encrypt_uri($user_name);
 			
 			//get encrypted user email
 			
 			$user_email = $user->user_email;
-			$user_email = $this->ussync_encrypt_uri($user_email);
+			$user_email = $this->encrypt_uri($user_email);
 			
 			//get current domain
 			
@@ -527,7 +527,7 @@ class User_Session_Synchronizer {
 			
 			//$user_ref = $_SERVER['HTTP_HOST'];
 			$user_ref = $current_domain;
-			$user_ref = $this->ussync_encrypt_uri($user_ref);
+			$user_ref = $this->encrypt_uri($user_ref);
 			
 			if(!empty($domains)){
 				
@@ -569,7 +569,7 @@ class User_Session_Synchronizer {
 		}
 	}
 	
-	private function ussync_get_secret_iv(){
+	private function get_secret_iv(){
 		
 		//$secret_iv = md5( $this->user_agent . $this->user_ip );
 		//$secret_iv = md5( $this->user_ip );
@@ -578,7 +578,7 @@ class User_Session_Synchronizer {
 		return $secret_iv;
 	}
 	
-	private function ussync_encrypt_str($string){
+	private function encrypt_str($string){
 		
 		$output = false;
 
@@ -586,7 +586,7 @@ class User_Session_Synchronizer {
 		
 		$secret_key = md5( $this -> secret_key );
 		
-		$secret_iv = $this->ussync_get_secret_iv();
+		$secret_iv = $this->get_secret_iv();
 		
 		// hash
 		$key = hash('sha256', $secret_key);
@@ -595,12 +595,12 @@ class User_Session_Synchronizer {
 		$iv = substr(hash('sha256', $secret_iv), 0, 16);
 
 		$output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
-		$output = $this->ussync_base64_urlencode($output);
+		$output = $this->base64_urlencode($output);
 
 		return $output;
 	}
 	
-	private function ussync_decrypt_str($string){
+	private function decrypt_str($string){
 		
 		$output = false;
 
@@ -608,7 +608,7 @@ class User_Session_Synchronizer {
 		
 		$secret_key = md5( $this->secret_key );
 		
-		$secret_iv = $this->ussync_get_secret_iv();
+		$secret_iv = $this->get_secret_iv();
 
 		// hash
 		$key = hash( 'sha256', $secret_key);
@@ -616,31 +616,31 @@ class User_Session_Synchronizer {
 		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
 		$iv = substr( hash( 'sha256', $secret_iv ), 0, 16);
 
-		$output = openssl_decrypt($this->ussync_base64_urldecode($string), $encrypt_method, $key, 0, $iv);
+		$output = openssl_decrypt($this->base64_urldecode($string), $encrypt_method, $key, 0, $iv);
 
 		return $output;
 	}
 	
-	private function ussync_encrypt_uri($uri,$len=250,$separator='/'){
+	private function encrypt_uri($uri,$len=250,$separator='/'){
 		
-		$uri = wordwrap($this->ussync_encrypt_str($uri),$len,$separator,true);
-		
-		return $uri;
-	}
-	
-	private function ussync_decrypt_uri($uri,$separator='/'){
-		
-		$uri = $this->ussync_decrypt_str(str_replace($separator,'',$uri));
+		$uri = wordwrap($this->encrypt_str($uri),$len,$separator,true);
 		
 		return $uri;
 	}
 	
-	private function ussync_base64_urlencode($inputStr=''){
+	private function decrypt_uri($uri,$separator='/'){
+		
+		$uri = $this->decrypt_str(str_replace($separator,'',$uri));
+		
+		return $uri;
+	}
+	
+	private function base64_urlencode($inputStr=''){
 
 		return strtr(base64_encode($inputStr), '+/=', '-_,');
 	}
 
-	private function ussync_base64_urldecode($inputStr=''){
+	private function base64_urldecode($inputStr=''){
 
 		return base64_decode(strtr($inputStr, '-_,', '+/='));
 	}

@@ -10,7 +10,7 @@
 		
 		<body>
 
-			<?php $this->ussync_call_domains(); ?>
+			<?php $this->get_domains(); ?>
 
 			Loading...
 			

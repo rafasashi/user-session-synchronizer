@@ -42,7 +42,7 @@ class User_Session_Synchronizer_Session_Control {
 	 *
 	 * @return void
 	 */
-	public function ussync_session_control() {
+	public function session_control() {
 		
 		if (
 			! empty( $_GET['_wpnonce'] )
@@ -61,10 +61,10 @@ class User_Session_Synchronizer_Session_Control {
 				wp_die( __( 'Cheatin&#8217; uh?', 'user-session-synchronizer' ) );
 			}
 
-			$this->ussync_destroy_user_session( $user_id, $_GET['token_hash'] );
+			$this->destroy_user_session( $user_id, $_GET['token_hash'] );
 		}
 
-		$results = $this->ussync_get_all_sessions();
+		$results = $this->get_all_sessions();
 		$sorted  = array();
 		$spp     = ! empty( $_GET['sessions_per_page'] ) ? absint( $_GET['sessions_per_page'] ) : 20;
 		$paged   = ! empty( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
@@ -121,7 +121,7 @@ class User_Session_Synchronizer_Session_Control {
 			unset( $columns['role'] );
 		}
 
-		$users = $this->ussync_get_users_with_sessions();
+		$users = $this->get_users_with_sessions();
 
 		global $wp_roles;
 
@@ -291,7 +291,7 @@ class User_Session_Synchronizer_Session_Control {
 	 *
 	 * @return array
 	 */
-	public function ussync_get_all_sessions_raw() {
+	public function get_all_sessions_raw() {
 		global $wpdb;
 
 		$results  = array();
@@ -312,7 +312,7 @@ class User_Session_Synchronizer_Session_Control {
 	 *
 	 * @return object WP_User
 	 */
-	public function ussync_get_users_with_sessions() {
+	public function get_users_with_sessions() {
 		$args = array(
 			'number'     => 9999,
 			'blog_id'    => is_network_admin() ? 0 : get_current_blog_id(),
@@ -334,10 +334,10 @@ class User_Session_Synchronizer_Session_Control {
 	 *
 	 * @return array
 	 */
-	public function ussync_get_all_sessions() {
+	public function get_all_sessions() {
 		$results  = array();
-		$users    = $this->ussync_get_users_with_sessions()->get_results();
-		$sessions = $this->ussync_get_all_sessions_raw();
+		$users    = $this->get_users_with_sessions()->get_results();
+		$sessions = $this->get_all_sessions_raw();
 
 		foreach ( $users as $user ) {
 			$user_sessions = get_user_meta( $user->ID, 'session_tokens', true );
@@ -375,7 +375,7 @@ class User_Session_Synchronizer_Session_Control {
 	 *
 	 * @return void
 	 */
-	public function ussync_destroy_user_session( $user_id, $token_hash ) {
+	public function destroy_user_session( $user_id, $token_hash ) {
 		
 		$session_tokens = get_user_meta( $user_id, 'session_tokens', true );
 
