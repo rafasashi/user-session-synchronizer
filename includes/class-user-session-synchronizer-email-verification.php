@@ -108,12 +108,12 @@
 			update_option("ussync_email_conf_title", "Please Verify Your email Account");
 		}
 
-		public function get_email_setting() {
+		public function view_email_setting() {
 			
 			include plugin_dir_path(__FILE__) . "views/email-setting.php";
 		}
 
-		public function user_email_verification() {
+		public function view_email_verification() {
 
 			include plugin_dir_path(__FILE__) . "views/email-verification.php";
 		}
