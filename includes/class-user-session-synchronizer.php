@@ -541,6 +541,7 @@ class User_Session_Synchronizer {
 						
 						if($loggingout===true){
 							
+							/*
 							$opts = array(
 							  'http'=>array(
 								'method' => "GET",
@@ -552,6 +553,22 @@ class User_Session_Synchronizer {
 							$context = stream_context_create($opts);							
 							
 							$response = file_get_contents($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
+							
+							*/
+							
+							$ch = curl_init($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time());
+							
+							curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
+							curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+							curl_setopt ($ch, CURLOPT_HTTPHEADER, array(
+							
+								"User-Agent: " . $this -> user_agent,
+								"X-Forwarded-For: " . $this->user_ip,
+							));
+							curl_setopt($ch, CURLOPT_POST, 0);
+							curl_setopt($ch, CURLOPT_HTTPGET, 1);
+							
+							$response = curl_exec($ch);							 
 							 
 							//var_dump($response);exit;
 						}
