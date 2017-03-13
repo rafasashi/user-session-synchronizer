@@ -578,7 +578,7 @@ class User_Session_Synchronizer {
 						
 							//echo '<img class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
 							
-							echo'<iframe class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;"></iframe>';
+							echo'<iframe class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;position:absolute;display:block;"></iframe>';
 						}
 					}
 				}				
