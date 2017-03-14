@@ -133,7 +133,7 @@ class User_Session_Synchronizer {
 			
 			$this -> proto = 'http://';
 		}
-		
+
 		// register plugin activation hook
 		
 		register_activation_hook( $this->file, array( $this, 'install' ) );
@@ -152,12 +152,12 @@ class User_Session_Synchronizer {
 			$this->admin = new User_Session_Synchronizer_Admin_API();
 		}
 
+		// Handle login synchronization
+		add_action( 'init', array( $this, 'synchronize_session' ), 0 );		
+		
 		// Handle localisation
 		$this->load_plugin_textdomain();
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
-
-		// Handle login synchronization
-		add_action( 'init', array( $this, 'synchronize_session' ), 0 );		
 		
 		// Handle profile updates
 		add_action( 'user_profile_update_errors', array( $this, 'prevent_email_change'), 10, 3 );
@@ -256,21 +256,29 @@ class User_Session_Synchronizer {
 		
 		// synchronize sessions
 
-		if(isset($_GET['action'])&&$_GET['action']=='logout'){
+		if( isset($_GET['action']) && $_GET['action']=='logout' ){
 			
 			$this-> get_domains(true);
 		}
-		elseif(isset($_GET['ussync-status']) && $_GET['ussync-status']=='loggedin'){
+		elseif( isset($_GET['ussync-status']) && $_GET['ussync-status']=='loggedin' ){
 			
 			echo 'User logged in!';
 			exit;
 		}
-		elseif(is_user_logged_in() && isset($_GET['redirect_to'])){
+		elseif( is_user_logged_in() && isset($_GET['redirect_to']) ){
 			
-			wp_safe_redirect( trim( $_GET['redirect_to'] ) );
+			if( !empty($_GET['reauth']) && $_GET['reauth'] == '1' ){
+				
+				echo 'Error accessing the current session...';			
+			}
+			else{
+
+				wp_safe_redirect( trim( $_GET['redirect_to'] ) );
+			}
+			
 			exit;
 		}
-		elseif(isset($_GET['ussync-token'])&&isset($_GET['ussync-id'])&&isset($_GET['ussync-ref'])){
+		elseif( isset($_GET['ussync-token']) && isset($_GET['ussync-id']) && isset($_GET['ussync-ref']) ){
 
 			//decrypted user_name
 			
@@ -347,8 +355,8 @@ class User_Session_Synchronizer {
 				else{
 					
 					$current_user = wp_get_current_user();
-
-					if(!is_user_logged_in()){				
+					
+					if(!is_user_logged_in()){			
 						
 						// check if the user exists
 						
@@ -389,13 +397,12 @@ class User_Session_Synchronizer {
 							}
 						}
 						
-						if($current_user->user_email != $user_email){
-							
-							//destroy current user session
+						// destroy current user session
 
-							$sessions = WP_Session_Tokens::get_instance($current_user->ID);
-							$sessions->destroy_all();	
-						}					
+						$sessions = WP_Session_Tokens::get_instance($current_user->ID);
+						$sessions->destroy_all();	
+
+						// get new user
 						
 						$user = get_user_by('email',$user_email);
 						
@@ -407,7 +414,7 @@ class User_Session_Synchronizer {
 							
 							wp_clear_auth_cookie();
 							wp_set_current_user( $user->ID );
-							wp_set_auth_cookie( $user->ID , true, false);
+							wp_set_auth_cookie( $user->ID , true, is_ssl());
 
 							update_user_caches($user);
 							
@@ -416,8 +423,7 @@ class User_Session_Synchronizer {
 								//redirect after authentication
 								
 								//wp_safe_redirect( rtrim( get_site_url(), '/' ) . '/?ussync-status=loggedin');
-							
-								
+
 								echo 'User '.$user->ID . ' logged in...';
 								exit;
 							}
@@ -536,51 +542,63 @@ class User_Session_Synchronizer {
 					$domain = trim($domain);
 					$domain = rtrim($domain,'/');
 					$domain = preg_replace("(^https?://)", "", $domain);
-					
-					if($current_domain != $domain){
-						
-						if($loggingout===true){
-							
-							/*
-							$opts = array(
-							  'http'=>array(
-								'method' => "GET",
-								'header' => "User-Agent: " . $this -> user_agent . "\r\n" . 
-											"X-Forwarded-For: " . $this->user_ip . "\r\n"
-							  )
-							);
 
-							$context = stream_context_create($opts);							
-							
-							$response = file_get_contents($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
-							
-							*/
-							
-							$ch = curl_init($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time());
-							
-							curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
-							curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-							curl_setopt ($ch, CURLOPT_HTTPHEADER, array(
-							
-								"User-Agent: " . $this -> user_agent,
-								"X-Forwarded-For: " . $this->user_ip,
-							));
-							curl_setopt($ch, CURLOPT_POST, 0);
-							curl_setopt($ch, CURLOPT_HTTPGET, 1);
-							
-							$response = curl_exec($ch);							 
-							 
-							//var_dump($response);exit;
-						}
-						else{
-							
-							//output html
+					if($loggingout===true){
+
+						/*
+						$opts = array(
+						  'http'=>array(
+							'method' => "GET",
+							'header' => "User-Agent: " . $this -> user_agent . "\r\n" . 
+										"X-Forwarded-For: " . $this->user_ip . "\r\n"
+						  )
+						);
+
+						$context = stream_context_create($opts);							
 						
-							//echo '<img class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
-							
-							echo'<iframe class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;position:absolute;display:block;"></iframe>';
-						}
+						$response = file_get_contents($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
+						
+						*/
+						
+						$ch = curl_init($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time());
+						
+						curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
+						curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+						curl_setopt ($ch, CURLOPT_HTTPHEADER, array(
+						
+							"User-Agent: " . $this -> user_agent,
+							"X-Forwarded-For: " . $this->user_ip,
+						));
+						curl_setopt($ch, CURLOPT_POST, 0);
+						curl_setopt($ch, CURLOPT_HTTPGET, 1);
+						
+						$response = curl_exec($ch);							 
+						 
+						//var_dump($response) . PHP_EOL . PHP_EOL;
+						
 					}
+					elseif($current_domain != $domain){
+						
+						//output html
+					
+						//echo '<img class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" height="1" width="1" style="border-style:none;" >';								
+						
+						echo'<iframe class="ussync" src="' . $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&_' . time() . '" style="width:1px;height:1px;border-style:none;position:absolute;display:block;"></iframe>';
+					}
+				}
+				
+				if($loggingout===true){
+					
+					if(!empty($_GET['redirect_to'])){
+						
+						wp_safe_redirect( trim( $_GET['redirect_to'] ) );
+					}
+					else{
+						
+						wp_safe_redirect( wp_login_url() );
+					}
+					
+					exit;
 				}				
 			}
 		}
