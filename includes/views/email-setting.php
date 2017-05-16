@@ -15,7 +15,7 @@
 	
 	if($email_title==''&&$email_sender==''&&$email_content==''){
 
-		$this->ussync_activate_plugins_email();
+		$this->activate_plugins_email();
 		
 		$email_title=get_option("ussync_email_conf_title");
 		$email_sender=get_option("ussync_email_confemail");	
