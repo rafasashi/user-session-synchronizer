@@ -258,7 +258,7 @@ class User_Session_Synchronizer {
 
 		if( isset($_GET['action']) && $_GET['action']=='logout' ){
 			
-			$this-> get_domains(true);
+			$this->get_domains(true);
 		}
 		elseif( isset($_GET['ussync-status']) && $_GET['ussync-status']=='loggedin' ){
 			
@@ -543,39 +543,19 @@ class User_Session_Synchronizer {
 					$domain = rtrim($domain,'/');
 					$domain = preg_replace("(^https?://)", "", $domain);
 
-					if($loggingout===true){
+					if( $loggingout===true ){
 
-						/*
-						$opts = array(
-						  'http'=>array(
-							'method' => "GET",
-							'header' => "User-Agent: " . $this -> user_agent . "\r\n" . 
-										"X-Forwarded-For: " . $this->user_ip . "\r\n"
-						  )
-						);
+						$url = $this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time();
 
-						$context = stream_context_create($opts);							
+						$response = wp_remote_get( $url, array(
 						
-						$response = file_get_contents($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time(), false, $context);
-						
-						*/
-						
-						$ch = curl_init($this -> proto . $domain . '/?ussync-token='.$user_email.'&ussync-key='.$this -> key_num.'&ussync-id='.$user_name.'&ussync-ref='.$user_ref.'&ussync-status=loggingout'.'&_' . time());
-						
-						curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
-						curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-						curl_setopt ($ch, CURLOPT_HTTPHEADER, array(
-						
-							"User-Agent: " . $this -> user_agent,
-							"X-Forwarded-For: " . $this->user_ip,
-						));
-						curl_setopt($ch, CURLOPT_POST, 0);
-						curl_setopt($ch, CURLOPT_HTTPGET, 1);
-						
-						$response = curl_exec($ch);							 
-						 
-						//var_dump($response) . PHP_EOL . PHP_EOL;
-						
+							'timeout'     => 5,
+							'user-agent'  => $this -> user_agent,
+							'headers'     => array(
+							
+								'X-Forwarded-For' => $this->user_ip
+							),
+						)); 						
 					}
 					elseif($current_domain != $domain){
 						
@@ -587,7 +567,9 @@ class User_Session_Synchronizer {
 					}
 				}
 				
-				if($loggingout===true){
+				if( $loggingout === true ){
+					
+					wp_logout();
 					
 					if(!empty($_GET['redirect_to'])){
 						
