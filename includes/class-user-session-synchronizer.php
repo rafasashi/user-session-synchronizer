@@ -183,11 +183,16 @@ class User_Session_Synchronizer {
 	}	
 	
 	public function prevent_email_change( $errors, $update, $user ) {
+	
+		if( !empty($user->ID) ){
+	
+			$old = get_user_by('id', $user->ID);
 
-		$old = get_user_by('id', $user->ID);
-
-		if( $user->user_email != $old->user_email   && (!current_user_can('create_users')) )
+			if( $user->user_email != $old->user_email   && (!current_user_can('create_users')) ){
+				
 				$user->user_email = $old->user_email;
+			}
+		}
 	}
 	
 	public function disable_user_profile_fields() {
