@@ -29,14 +29,17 @@
 	* Add donation link
 	*
 	*/
-	function user_session_synchronizer_row_meta( $links, $file ){
+	
+	add_filter('plugin_row_meta', function ( $links, $file ){
+		
 		if ( strpos( $file, basename( __FILE__ ) ) !== false ) {
 			$new_links = array( '<a href="https://www.paypal.me/recuweb" target="_blank">' . __( 'Donate', 'cleanlogin' ) . '</a>' );
 			$links = array_merge( $links, $new_links );
 		}
+		
 		return $links;
-	}
-	add_filter('plugin_row_meta', 'user_session_synchronizer_row_meta', 10, 2);
+		
+	}, 10, 2);
 
 	// Load plugin class files
 	require_once( 'includes/class-user-session-synchronizer.php' );
