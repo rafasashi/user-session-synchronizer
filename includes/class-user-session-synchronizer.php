@@ -112,7 +112,7 @@ class User_Session_Synchronizer {
 		
 		// set secret key number
 		
-		$this -> key_num=1;
+		$this -> key_num = 1;
 		
 		if(isset($_GET['ussync-key'])){
 			
@@ -515,8 +515,8 @@ class User_Session_Synchronizer {
 
 			//get list of domains
 			
-			$domains = get_option('ussync_domain_list_'.$this -> key_num);
-			$domains = explode(PHP_EOL,$domains);
+			$domains = get_option( 'ussync_domain_list_'.$this -> key_num );
+			$domains = explode( PHP_EOL, $domains );
 			
 			//get encrypted user name
 			
