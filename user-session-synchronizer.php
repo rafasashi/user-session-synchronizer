@@ -1,13 +1,13 @@
 <?php
 /*
  * Plugin Name: User Session Synchronizer
- * Version: 1.3.8
- * Plugin URI: https://github.com/rafasashi/user-session-synchronizer/archive/master.zip
+ * Version: 1.4.0
+ * Plugin URI: https://code.recuweb.com/get/user-session-synchronizer/
  * Description: Keep the user logged in from one wordpress to another by synchronizing user data and cookie session.
  * Author: Rafasashi
- * Author URI: https://www.linkedin.com/in/raphaeldartigues
+ * Author URI: https://code.recuweb.com
  * Requires at least: 4.3
- * Tested up to: 4.7
+ * Tested up to: 6.2
  *
  * Text Domain: user-session-synchronizer
  * Domain Path: /lang/
@@ -29,17 +29,14 @@
 	* Add donation link
 	*
 	*/
-	
-	add_filter('plugin_row_meta', function ( $links, $file ){
-		
+	function user_session_synchronizer_row_meta( $links, $file ){
 		if ( strpos( $file, basename( __FILE__ ) ) !== false ) {
 			$new_links = array( '<a href="https://www.paypal.me/recuweb" target="_blank">' . __( 'Donate', 'cleanlogin' ) . '</a>' );
 			$links = array_merge( $links, $new_links );
 		}
-		
 		return $links;
-		
-	}, 10, 2);
+	}
+	add_filter('plugin_row_meta', 'user_session_synchronizer_row_meta', 10, 2);
 
 	// Load plugin class files
 	require_once( 'includes/class-user-session-synchronizer.php' );

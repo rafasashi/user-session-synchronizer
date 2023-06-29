@@ -1,12 +1,12 @@
 === User Session Synchronizer ===
 Contributors: rafasashi
-Donate link: https://code.recuweb.com
+Donate link: https://code.recuweb.com/get/user-session-synchronizer/
 Tags: user, session, synchronizer, cookie
 Requires at least: 4.3
-Tested up to: 4.9.5
-Stable tag: 1.3.8
-License: GPLv3
-License URI: https://code.recuweb.com/product-licenses/
+Tested up to: 6.2
+Stable tag: 1.4.0
+License: GPLv3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Keep the user logged in from one wordpress to another by synchronizing user data and cookie session  
 

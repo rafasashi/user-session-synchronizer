@@ -295,7 +295,7 @@ class User_Session_Synchronizer_Admin_API {
 	 */
 	public function save_meta_boxes ( $post_id = 0 ) {
 
-		if ( ! $post_id ) return;
+		if( !$post_id || ( isset($_POST['_inline_edit']) && wp_verify_nonce($_POST['_inline_edit'],'inlineeditnonce') ) ) return;
 
 		$post_type = get_post_type( $post_id );
 
